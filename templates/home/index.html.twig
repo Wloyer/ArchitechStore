@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - ArchiStore{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Bienvenue sur ArchiStore</h1>
+
+        {% if app.user %}
+            <p>Bonjour {{ app.user.userIdentifier }}</p>
+            <a href="" class="btn btn-secondary">Déconnexion</a>
+        {% else %}
+            <p>Veuillez vous connecter ou vous inscrire pour accéder à votre espace de stockage.</p>
+            <a href="" class="btn btn-primary">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-success">Inscription</a>
+        {% endif %}
+
+        <div class="mt-5">
+            <h2>À propos d'ArchiStore</h2>
+            <p>ArchiStore est une plateforme de stockage sécurisée pour les clients de notre cabinet d'architectes. Stockez, gérez et partagez vos fichiers en toute sécurité.</p>
+        </div>
+    </div>
+{% endblock %}
