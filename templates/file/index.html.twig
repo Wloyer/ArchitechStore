@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}File index{% endblock %}
+
+{% block body %}
+    <h1>File index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FileName</th>
+                <th>Size</th>
+                <th>UploadDate</th>
+                <th>Type</th>
+                <th>Path</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in files %}
+            <tr>
+                <td>{{ file.id }}</td>
+                <td>{{ file.fileName }}</td>
+                <td>{{ file.size }}</td>
+                <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ file.type }}</td>
+                <td>{{ file.path }}</td>
+                <td>
+                    <a href="{{ path('app_file_show', {'id': file.id}) }}">show</a>
+                    <a href="{{ path('app_file_edit', {'id': file.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_file_new') }}">Create new</a>
+{% endblock %}

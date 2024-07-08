@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User{% endblock %}
+
+{% block body %}
+    <h1>User</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <th>LastName</th>
+                <td>{{ user.lastName }}</td>
+            </tr>
+            <tr>
+                <th>FirstName</th>
+                <td>{{ user.firstName }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>{{ user.password }}</td>
+            </tr>
+            <tr>
+                <th>Phone_number</th>
+                <td>{{ user.phoneNumber }}</td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td>{{ user.address }}</td>
+            </tr>
+            <tr>
+                <th>ZipCode</th>
+                <td>{{ user.zipCode }}</td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td>{{ user.City }}</td>
+            </tr>
+            <tr>
+                <th>Country</th>
+                <td>{{ user.Country }}</td>
+            </tr>
+            <tr>
+                <th>RegistrationDate</th>
+                <td>{{ user.registrationDate ? user.registrationDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>TotalStorageSpace</th>
+                <td>{{ user.totalStorageSpace }}</td>
+            </tr>
+            <tr>
+                <th>StorageLimit</th>
+                <td>{{ user.storageLimit }}</td>
+            </tr>
+            <tr>
+                <th>StorageUsed</th>
+                <td>{{ user.storageUsed }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ user.role ? user.role|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_user_index') }}">back to list</a>
+
+    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+
+    {{ include('user/_delete_form.html.twig') }}
+{% endblock %}
