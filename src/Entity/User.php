@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\HasLifecycleCallbacks()]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -59,19 +60,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $registrationDate = null;
 
     #[ORM\Column]
-    private ?int $totalStorageSpace = null;
+    private ?int $totalStorageSpace = 0;
 
     #[ORM\Column]
-    private ?int $storageLimit = null;
+    private ?int $storageLimit = 0;
 
     #[ORM\Column]
-    private ?int $storageUsed = null;
+    private ?int $storageUsed = 0;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    public function __construct()
+    {
+        $this->registrationDate = new \DateTime();
+        $this->isVerified = false;
+    }
+
+    #[ORM\PrePersist]
+    public function setRegistrationDateValue(): void
+    {
+        if ($this->registrationDate === null) {
+            $this->registrationDate = new \DateTime();
+        }
+    }
 
     public function getId(): ?int
     {
@@ -236,9 +251,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->registrationDate;
     }
 
-    public function setRegistrationDate(\DateTimeInterface $registrationDate): static
+    public function setRegistrationDate(?\DateTimeInterface $registrationDate): static
     {
-        $this->registrationDate = $registrationDate;
+        $this->registrationDate = $registrationDate ?: new \DateTime();
 
         return $this;
     }

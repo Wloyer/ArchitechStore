@@ -8,10 +8,10 @@
 
         {% if app.user %}
             <p>Bonjour {{ app.user.userIdentifier }}</p>
-            <a href="" class="btn btn-secondary">Déconnexion</a>
+            <a href="{{ path('app_logout') }}" class="btn btn-secondary">Déconnexion</a>
         {% else %}
             <p>Veuillez vous connecter ou vous inscrire pour accéder à votre espace de stockage.</p>
-            <a href="" class="btn btn-primary">Connexion</a>
+            <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
             <a href="{{ path('app_register') }}" class="btn btn-success">Inscription</a>
         {% endif %}
 
