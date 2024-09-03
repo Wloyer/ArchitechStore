@@ -23,3 +23,12 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+/.idea/codeception.xml
+/.idea/commandlinetools/schemas/frameworkDescriptionVersion1.1.4.xsd
+/.idea/git_toolbox_blame.xml
+/.idea/material_theme_project_new.xml
+/.idea/php.xml
+/.idea/phpspec.xml
+/.idea/phpunit.xml
+/.idea/commandlinetools/Symfony_9_3_24__3_06_PM.xml
+/.idea/vcs.xml
