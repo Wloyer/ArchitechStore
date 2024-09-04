@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Welcome to the Admin Dashboard</h1>
+
+        <p class="lead">Manage your site here.</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Users</h5>
+                        <p class="card-text">Manage users, update roles, and more.</p>
+                        <a href="{{ path('app_user_index') }}"  class="btn btn-primary">Manage Users</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Files</h5>
+                        <p class="card-text">Manage your other entities from here.</p>
+                        <a href="{{ path('app_file_index') }}" class="btn btn-primary">Manage Entities</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Invoices</h5>
+                        <p class="card-text">Manage your other entities from here.</p>
+                        <a href="{{ path('app_invoice_index') }}" class="btn btn-primary">Manage Entities</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Transaction</h5>
+                        <p class="card-text">Manage your other entities from here.</p>
+                        <a href="{{ path('app_file_transaction') }}" class="btn btn-primary">Manage Entities</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
