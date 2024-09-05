@@ -17,7 +17,18 @@
     {% block header %}
         {% include 'partials/header.html.twig' %}
     {% endblock %}
-
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% if app.user and app.user.isVerified == false  %}
+    <div class="alert alert-warning mt-3">
+        <strong>Votre compte n'est pas encore vérifié.</strong> Veuillez vérifier votre boîte mail.
+    </div>
+    {% endif %}
     {% block body %}{% endblock %}
 
     {% block footer %}

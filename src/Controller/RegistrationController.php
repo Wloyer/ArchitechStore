@@ -62,6 +62,7 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
+            $this->addFlash('success', 'Your account has been created. Please check your email to confirm your address.');
             // Rediriger vers la page de paiement
             return $this->redirectToRoute('app_transaction', ['id' => $transaction->getId()]);
         }
@@ -79,15 +80,16 @@ class RegistrationController extends AbstractController
         // validate email confirmation link, sets User::isVerified=true and persists
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
+            // Ajouter un message flash de succès pour la vérification de l'email
+            $this->addFlash('success', 'Your email address has been verified.');
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+            // Ajouter un message flash d'erreur si la vérification échoue
+            $this->addFlash('warning', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
             return $this->redirectToRoute('app_register');
         }
 
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
-
-        return $this->redirectToRoute('app_register');
+        return $this->redirectToRoute('app_home');
     }
+
 }
