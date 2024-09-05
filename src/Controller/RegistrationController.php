@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Entity\Transaction;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -30,9 +31,9 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
+            // Encode the plain password
             $user->setPassword(
-                    $userPasswordHasher->hashPassword(
+                $userPasswordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
@@ -41,7 +42,18 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
+            // Créer une transaction de paiement pour l'achat de stockage
+            $transaction = new Transaction();
+            $transaction->setUserTransaction($user);
+            $transaction->setAmount(20.00); // Montant fixe de 20€
+            $transaction->setTransactionType('Storage Purchase');
+            $transaction->setTransactionDate(new \DateTime());
+            $transaction->setStatus('pending'); // Statut initial 'pending'
+
+            $entityManager->persist($transaction);
+            $entityManager->flush();
+
+            // Envoyer un email de confirmation avec un lien de vérification
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
                     ->from(new Address('mailtrap@mail.com', 'mailtrap'))
@@ -50,9 +62,9 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-            // do anything else you need here, like send an email
-
-            return $this->redirectToRoute('app_home');
+            $this->addFlash('success', 'Your account has been created. Please check your email to confirm your address.');
+            // Rediriger vers la page de paiement
+            return $this->redirectToRoute('app_transaction', ['id' => $transaction->getId()]);
         }
 
         return $this->render('registration/register.html.twig', [
@@ -68,15 +80,16 @@ class RegistrationController extends AbstractController
         // validate email confirmation link, sets User::isVerified=true and persists
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
+            // Ajouter un message flash de succès pour la vérification de l'email
+            $this->addFlash('success', 'Your email address has been verified.');
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+            // Ajouter un message flash d'erreur si la vérification échoue
+            $this->addFlash('warning', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
             return $this->redirectToRoute('app_register');
         }
 
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
-
-        return $this->redirectToRoute('app_register');
+        return $this->redirectToRoute('app_home');
     }
+
 }

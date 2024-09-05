@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment{% endblock %}
+
+{% block body %}
+    <h1>Payment</h1>
+
+    {{ form_start(paymentForm) }}
+    {{ form_row(paymentForm.cardNumber) }}
+    {{ form_row(paymentForm.cardHolderName) }}
+    {{ form_row(paymentForm.expiryDate) }}
+    {{ form_row(paymentForm.cvv) }}
+    {{ form_row(paymentForm.acceptTerms) }}
+    {{ form_row(paymentForm.submit) }}
+    {{ form_end(paymentForm) }}
+
+{% endblock %}

@@ -44,7 +44,11 @@
                 <td>{{ user.totalStorageSpace }}</td>
                 <td>{{ user.storageLimit }}</td>
                 <td>{{ user.storageUsed }}</td>
-                <td>{{ user.role ? user.role|json_encode : '' }}</td>
+                <td>
+                    {% for role in user.roles %}
+                        {{ role }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
                 <td>{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>

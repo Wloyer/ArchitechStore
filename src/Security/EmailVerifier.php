@@ -35,6 +35,10 @@ class EmailVerifier
 
         $email->context($context);
 
+        dump($email);
+        dump($signatureComponents->getSignedUrl());
+
+
         $this->mailer->send($email);
     }
 

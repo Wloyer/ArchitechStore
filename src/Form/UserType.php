@@ -6,32 +6,79 @@ use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('lastName')
-            ->add('firstName')
-            ->add('email')
-            ->add('password')
-            ->add('phone_number')
-            ->add('address')
-            ->add('zipCode')
-            ->add('City')
-            ->add('Country')
-            ->add('registrationDate', null, [
-                'widget' => 'single_text'
+            ->add('lastName', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Last Name',
+                'label_attr' => ['class' => 'form-label'],
             ])
-            ->add('totalStorageSpace')
-            ->add('storageLimit')
-            ->add('storageUsed')
-            ->add('role')
-            ->add('updatedAt', null, [
-                'widget' => 'single_text'
+            ->add('firstName', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'First Name',
+                'label_attr' => ['class' => 'form-label'],
             ])
-        ;
+            ->add('email', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Email',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('password', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Password',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('phone_number', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Phone Number',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('address', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Address',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('zipCode', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Zip Code',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('City', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'City',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('Country', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Country',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('totalStorageSpace', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Total Storage Space',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('storageLimit', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Storage Limit',
+                'label_attr' => ['class' => 'form-label'],
+            ])
+            ->add('roles', ChoiceType::class, [
+                'choices' => [
+                    'Admin' => 'ROLE_ADMIN',
+                    'User' => 'ROLE_USER',
+                ],
+                'multiple' => true,
+                'expanded' => true,
+                'label' => 'Roles',
+                'label_attr' => ['class' => 'form-label'],
+                'attr' => ['class' => 'form-check-inline'],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
