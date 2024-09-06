@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register - Architecture Firm{% endblock %}
+{% block title %}Créer un compte{% endblock %}
 
 {% block body %}
     <div class="container mt-5">
@@ -9,40 +9,91 @@
         {% endfor %}
 
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <h1 class="text-center mb-4">Create Your Account</h1>
+            <div class="col-md-6">
+                <h1 class="text-center mb-4">Créer un compte</h1>
 
                 {{ form_start(registrationForm, {'attr': {'class': 'form-horizontal'}}) }}
 
+                <!-- Email field -->
                 <div class="form-group mb-3">
-                    {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter your email address'}}) }}
+                    {{ form_label(registrationForm.email, 'Adresse e-mail', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre adresse e-mail', 'type': 'email'}}) }}
                     {{ form_errors(registrationForm.email, {'attr': {'class': 'text-danger'}}) }}
                 </div>
 
+                <!-- Password field -->
                 <div class="form-group mb-3">
-                    {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Enter your password'}}) }}
+                    {{ form_label(registrationForm.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre mot de passe', 'type': 'password'}}) }}
                     {{ form_errors(registrationForm.plainPassword, {'attr': {'class': 'text-danger'}}) }}
                 </div>
 
+                <!-- First Name field -->
                 <div class="form-group mb-3">
+                    {{ form_label(registrationForm.firstName, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Jean'}}) }}
+                    {{ form_errors(registrationForm.firstName, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Last Name field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.lastName, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Dupont'}}) }}
+                    {{ form_errors(registrationForm.lastName, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Phone Number field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.phoneNumber, 'Numéro de téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control', 'placeholder': '06 12 34 56 78', 'type': 'tel'}}) }}
+                    {{ form_errors(registrationForm.phoneNumber, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Address field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.address, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.address, {'attr': {'class': 'form-control', 'placeholder': '123 Rue Exemple'}}) }}
+                    {{ form_errors(registrationForm.address, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Zip Code field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.zipCode, 'Code postal', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.zipCode, {'attr': {'class': 'form-control', 'placeholder': '75000'}}) }}
+                    {{ form_errors(registrationForm.zipCode, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- City field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.city, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.city, {'attr': {'class': 'form-control', 'placeholder': 'Paris'}}) }}
+                    {{ form_errors(registrationForm.city, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Country field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.country, 'Pays', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.country, {'attr': {'class': 'form-control', 'placeholder': 'France'}}) }}
+                    {{ form_errors(registrationForm.country, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Agree Terms checkbox -->
+                <div class="form-group mb-4">
                     <div class="form-check">
                         {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                        {{ form_label(registrationForm.agreeTerms, 'I agree to the terms and conditions', {'label_attr': {'class': 'form-check-label'}}) }}
+                        {{ form_label(registrationForm.agreeTerms, 'J\'accepte les termes et conditions', {'label_attr': {'class': 'form-check-label'}}) }}
                         {{ form_errors(registrationForm.agreeTerms, {'attr': {'class': 'text-danger'}}) }}
                     </div>
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                <!-- Submit button -->
+                <div class="d-grid gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
                 </div>
 
                 {{ form_end(registrationForm) }}
+
             </div>
         </div>
     </div>
-
-
 {% endblock %}
-

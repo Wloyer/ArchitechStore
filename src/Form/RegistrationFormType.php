@@ -5,16 +5,15 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
@@ -22,92 +21,111 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('firstName', TextType::class, [
-                'label' => 'First Name',
+                'label' => 'Prénom',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Jean'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your first name',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre prénom.']),
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Last Name',
+                'label' => 'Nom',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Dupont'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your last name',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre nom.']),
                 ],
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Email',
+                'label' => 'Adresse e-mail',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'exemple@domaine.com',
+                    'oninvalid' => "this.setCustomValidity('Veuillez entrer une adresse e-mail valide.')",
+                    'oninput' => "this.setCustomValidity('')"
+                ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your email',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre adresse e-mail.']),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
+                'label' => 'Mot de passe',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Entrez un mot de passe sécurisé'],
                 'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer un mot de passe.']),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères.',
                         'max' => 4096,
                     ]),
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
-                'label' => 'Phone Number',
+                'label' => 'Numéro de téléphone',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => '06 12 34 56 78',
+                    'maxlength' => 10,
+                    'pattern' => '[0-9]{10}', // HTML5 validation pattern
+                    'inputmode' => 'numeric', // Affiche un pavé numérique sur mobile
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57", // Empêche la saisie de caractères non numériques
+                    'oninvalid' => "this.setCustomValidity('Veuillez entrer un numéro de téléphone à 10 chiffres.')",
+                    'oninput' => "this.setCustomValidity('')" // Réinitialise le message personnalisé après correction
+                ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your phone number',
+                    new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone.']),
+                    new Regex([
+                        'pattern' => '/^[0-9]{10}$/',
+                        'message' => 'Le numéro de téléphone doit contenir exactement 10 chiffres.',
                     ]),
                 ],
             ])
             ->add('address', TextType::class, [
-                'label' => 'Address',
+                'label' => 'Adresse',
+                'attr' => ['class' => 'form-control', 'placeholder' => '123 Rue Exemple'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your address',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre adresse.']),
                 ],
             ])
             ->add('zipCode', TextType::class, [
-                'label' => 'Zip Code',
+                'label' => 'Code postal',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => '75000',
+                    'maxlength' => 5,
+                    'pattern' => '[0-9]{5}', // HTML5 validation pattern
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57", // Empêche la saisie de caractères non numériques
+                    'oninvalid' => "this.setCustomValidity('Veuillez entrer un code postal valide de 5 chiffres.')",
+                    'oninput' => "this.setCustomValidity('')"
+                ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your zip code',
+                    new NotBlank(['message' => 'Veuillez entrer votre code postal.']),
+                    new Regex([
+                        'pattern' => '/^[0-9]{5}$/',
+                        'message' => 'Le code postal doit contenir exactement 5 chiffres.',
                     ]),
                 ],
             ])
             ->add('city', TextType::class, [
-                'label' => 'City',
+                'label' => 'Ville',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Paris'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your city',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre ville.']),
                 ],
             ])
             ->add('country', TextType::class, [
-                'label' => 'Country',
+                'label' => 'Pays',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'France'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your country',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre pays.']),
                 ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
+                'label' => 'J\'accepte les termes et conditions',
+                'attr' => ['class' => 'form-check-input'],
                 'mapped' => false,
                 'constraints' => [
-                    new IsTrue([
-                        'message' => 'You should agree to our terms.',
-                    ]),
+                    new IsTrue(['message' => 'Vous devez accepter les termes.']),
                 ],
             ]);
     }
