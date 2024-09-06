@@ -3,21 +3,39 @@
 {% block title %}Accueil - ArchiStore{% endblock %}
 
 {% block body %}
+
+    <div class="container-fluid p-5 bg-light text-center">
+        <h1 class="display-4">Bienvenue chez ArchiStore</h1>
+        <p class="lead">Votre solution de stockage sécurisée pour tous vos projets architecturaux</p>
+        <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg mt-3">Commencez dès maintenant</a>
+    </div>
+
+
     <div class="container mt-5">
-        <h1>Bienvenue sur ArchiStore</h1>
-
-        {% if app.user %}
-            <p>Bonjour {{ app.user.userIdentifier }}</p>
-            <a href="{{ path('app_logout') }}" class="btn btn-secondary">Déconnexion</a>
-        {% else %}
-            <p>Veuillez vous connecter ou vous inscrire pour accéder à votre espace de stockage.</p>
-            <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
-            <a href="{{ path('app_register') }}" class="btn btn-success">Inscription</a>
-        {% endif %}
-
-        <div class="mt-5">
-            <h2>À propos d'ArchiStore</h2>
-            <p>ArchiStore est une plateforme de stockage sécurisée pour les clients de notre cabinet d'architectes. Stockez, gérez et partagez vos fichiers en toute sécurité.</p>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/150" alt="Sécurité" class="img-fluid mb-3">
+                <h3>Sécurité</h3>
+                <p>Protégez vos documents sensibles grâce à notre système de stockage sécurisé et chiffré.</p>
+            </div>
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/150" alt="Accessibilité" class="img-fluid mb-3">
+                <h3>Accessibilité</h3>
+                <p>Accédez à vos fichiers partout et à tout moment depuis n'importe quel appareil.</p>
+            </div>
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/150" alt="Collaboration" class="img-fluid mb-3">
+                <h3>Collaboration</h3>
+                <p>Partagez vos projets avec vos équipes et collaborez en temps réel sur vos plans et maquettes.</p>
+            </div>
         </div>
+    </div>
+
+    <!-- Appel à l'action Section -->
+    <div class="container-fluid p-5 bg-dark text-white text-center mt-5">
+        <h2>Prêt à gérer vos projets de manière plus efficace ?</h2>
+        <p>Rejoignez ArchiStore dès aujourd'hui et découvrez la puissance d'une solution de stockage adaptée aux architectes.</p>
+        <a href="{{ path('app_register') }}" class="btn btn-success btn-lg mt-3">Inscrivez-vous maintenant</a>
+    </div>
     </div>
 {% endblock %}
