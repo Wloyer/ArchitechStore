@@ -120,22 +120,70 @@ class FileController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_file_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, File $file, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(FileType::class, $file);
-        $form->handleRequest($request);
+    public function edit(Request $request, File $file, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+{
+    $form = $this->createForm(FileType::class, $file);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+    if ($form->isSubmitted() && $form->isValid()) {
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $form->get('attachment')->getData();
 
-            return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
+        if ($uploadedFile) {
+            // Vérifier si l'objet UploadedFile est valide
+            if (!$uploadedFile->isValid()) {
+                throw new \Exception('Le fichier n\'a pas été uploadé correctement.');
+            }
+
+            // Récupérer le nom du fichier original
+            $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+
+            // Obtenir la taille et le type MIME avant de déplacer le fichier
+            $fileSize = $uploadedFile->getSize();
+            $mimeType = $uploadedFile->getMimeType();
+
+            if ($fileSize === false) {
+                throw new \Exception('Impossible de récupérer la taille du fichier.');
+            }
+
+            // Générer un nom de fichier sécurisé
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+
+            try {
+                // Déplacer le fichier vers le répertoire de destination
+                $uploadedFile->move(
+                    $this->getParameter('upload_directory'),
+                    $newFilename
+                );
+
+                // Supprimer l'ancien fichier si nécessaire
+                $oldFilePath = $this->getParameter('upload_directory') . '/' . $file->getPath();
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+
+                // Mettre à jour les attributs du fichier dans l'entité
+                $file->setFileName($originalFilename);
+                $file->setSize($fileSize);  // Utilise la taille obtenue avant le déplacement
+                $file->setType($mimeType);  // Utilise le type MIME obtenu avant le déplacement
+                $file->setPath($newFilename);
+
+            } catch (FileException $e) {
+                throw new \Exception('Le téléchargement du fichier a échoué : ' . $e->getMessage());
+            }
         }
 
-        return $this->render('file/edit.html.twig', [
-            'file' => $file,
-            'form' => $form,
-        ]);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    return $this->render('file/edit.html.twig', [
+        'file' => $file,
+        'form' => $form,
+    ]);
+}
 
     #[Route('/{id}', name: 'app_file_delete', methods: ['POST'])]
     public function delete(Request $request, File $file, EntityManagerInterface $entityManager): Response
