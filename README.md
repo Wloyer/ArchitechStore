@@ -50,6 +50,7 @@ Installer les dépendances front-end et compiler les assets :
 
 bash
 
+npm init
 npm install
 npm run build
 
