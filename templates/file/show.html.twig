@@ -12,15 +12,15 @@
                 <td>{{ file.id }}</td>
             </tr>
             <tr>
-                <th>FileName</th>
+                <th>File Name</th>
                 <td>{{ file.fileName }}</td>
             </tr>
             <tr>
                 <th>Size</th>
-                <td>{{ file.size }}</td>
+                <td>{{ file.size / 1024 / 1024 }} MB</td>
             </tr>
             <tr>
-                <th>UploadDate</th>
+                <th>Upload Date</th>
                 <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>

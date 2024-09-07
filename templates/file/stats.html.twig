@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des fichiers{% endblock %}
+
+{% block body %}
+    <h1>Statistiques des fichiers</h1>
+
+    <ul>
+        <li>Nombre total de fichiers : {{ totalFiles }}</li>
+        <li>Nombre de fichiers uploadés aujourd'hui : {{ filesToday }}</li>
+    </ul>
+    <div>
+        <h2>Répartition du nombre de fichiers par client</h2>
+        <p><i>à compléter après connexion authentification/autorisations</i></p>
+    </div>
+
+    <a href="{{ path('app_file_index') }}">Retour à la liste des fichiers</a>
+{% endblock %}

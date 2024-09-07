@@ -5,16 +5,38 @@
 {% block body %}
     <h1>File index</h1>
 
+    <!-- Formulaire de filtre -->
+    <form method="get" action="{{ path('app_file_index') }}">
+        <div>
+            <label for="name">Rechercher par nom:</label>
+            <input type="text" name="name" id="name" value="{{ name }}" placeholder="Nom du fichier" />
+        </div>
+
+        <div>
+            <label for="format">Filtrer par format :</label>
+            <select name="format" id="format">
+                <option value="">Tous formats</option>
+                <option value="application/pdf" {{ format == 'application/pdf' ? 'selected' : '' }}>PDF</option>
+                <option value="image/jpeg" {{ format == 'image/jpeg' ? 'selected' : '' }}>JPEG</option>
+                <option value="image/png" {{ format == 'image/png' ? 'selected' : '' }}>PNG</option>
+                <!-- mémo : penser à ajouter les autres mimes types -->
+            </select>
+        </div>
+
+        <button type="submit">Filtrer</button>
+    </form>
+
+    <!-- Tableau des fichiers -->
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>FileName</th>
-                <th>Size</th>
-                <th>UploadDate</th>
-                <th>Type</th>
-                <th>Path</th>
-                <th>actions</th>
+                <th><a href="{{ path('app_file_index', { 'orderBy': 'id', 'direction': direction == 'ASC' ? 'DESC' : 'ASC', 'name': name, 'format': format }) }}">Identifiant</a></th>
+                <th><a href="{{ path('app_file_index', { 'orderBy': 'fileName', 'direction': direction == 'ASC' ? 'DESC' : 'ASC', 'name': name, 'format': format }) }}">Nom du fichier</a></th>
+                <th><a href="{{ path('app_file_index', { 'orderBy': 'size', 'direction': direction == 'ASC' ? 'DESC' : 'ASC', 'name': name, 'format': format }) }}">Taille du fichier</a></th>
+                <th><a href="{{ path('app_file_index', { 'orderBy': 'uploadDate', 'direction': direction == 'ASC' ? 'DESC' : 'ASC', 'name': name, 'format': format }) }}">Date de télechargement</a></th>
+                <th>Type de fichier</th>
+                <th>Chemin du fichier</th>
+                <th>Opérations</th>
             </tr>
         </thead>
         <tbody>
@@ -22,22 +44,30 @@
             <tr>
                 <td>{{ file.id }}</td>
                 <td>{{ file.fileName }}</td>
-                <td>{{ file.size }}</td>
+                <td>{{ file.size / 1024 / 1024 }} MB</td>
                 <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ file.type }}</td>
                 <td>{{ file.path }}</td>
                 <td>
-                    <a href="{{ path('app_file_show', {'id': file.id}) }}">show</a>
-                    <a href="{{ path('app_file_edit', {'id': file.id}) }}">edit</a>
+                    <a href="{{ path('app_file_show', {'id': file.id}) }}">Voir</a>
+                    <a href="{{ path('app_file_edit', {'id': file.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="7">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_file_new') }}">Create new</a>
+    <div>
+        <a href="{{ path('app_file_new') }}">Télécharger un nouveau fichier</a>
+    </div>
+
+    <div>
+        <a href="{{ path('app_file_stats') }}">Voir les statistiques</a>
+    </div>
+    
+    
 {% endblock %}
