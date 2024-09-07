@@ -61,3 +61,14 @@ bash
     symfony server:start
 
 Visitez http://localhost:8000 dans votre navigateur pour accéder à ArchiStore.
+
+
+Pour l'ajout de fichier
+il faut savoir que php  des tailles par défaut, il faut donc modifier le fichier php.ini
+C:\wamp64\bin\apache\apacheX.X.X\bin\php.ini
+Ouvrir le fichier php.ini et cherche ces directives
+upload_max_filesize = 2M
+post_max_size = 8M
+les modifier comme suit
+upload_max_filesize = 20G
+post_max_size = 20G
