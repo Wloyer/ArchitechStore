@@ -1,0 +1,30 @@
+{# templates/storage/plans.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Choisissez votre Plan de Stockage{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Choisissez votre Plan de Stockage</h1>
+
+        <div class="row">
+            {% for plan in plans %}
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header text-center">
+                            <h4 class="my-0">{{ plan.name }}</h4>
+                        </div>
+                        <div class="card-body text-center">
+                            <h1 class="card-title pricing-card-title">{{ plan.price }}€ <small>/ mois</small></h1>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li><strong>{{ plan.storage }}</strong> de stockage</li>
+                                <li>{{ plan.description }}</li>
+                            </ul>
+                            <a href="{{ path('app_payment', {'plan': plan.name, 'price': plan.price}) }}" class="btn btn-lg btn-block btn-primary">Choisir</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
