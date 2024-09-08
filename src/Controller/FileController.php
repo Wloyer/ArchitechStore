@@ -12,10 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\File as ConstraintsFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/file')]
+#[IsGranted('ROLE_USER')]
 class FileController extends AbstractController
 {
     #[Route('/', name: 'app_file_index', methods: ['GET', 'POST'])]

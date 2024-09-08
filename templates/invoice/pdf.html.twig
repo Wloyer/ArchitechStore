@@ -1,0 +1,57 @@
+{% extends 'base_pdf.html.twig' %}
+
+{% block title %}Facture N°{{ invoice.id }}{% endblock %}
+
+{% block body %}
+    <div class="invoice-header">
+        <h1>Facture N°{{ invoice.id }}</h1>
+        <p>Date de la facture: {{ invoice.InvoiceDate|date('d/m/Y') }}</p>
+    </div>
+
+    <div class="invoice-details">
+        <div class="client-details">
+            <h2>Client</h2>
+            <p>{{ user.firstName }} {{ user.lastName }}<br>
+            {{ user.address }}<br>
+            {{ user.zipCode }} {{ user.city }}<br>
+            {{ user.country }}</p>
+        </div>
+
+        <div class="company-details">
+            <h2>Société</h2>
+            <p>Société Archistore<br>
+            2 place de l'architecte<br>
+            75015 Paris<br>
+            SIRET: 876544368</p>
+        </div>
+    </div>
+
+    <h2>Détails de la facture</h2>
+    <p>Achat unique pour un espace de stockage de 20Go</p>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Montant HT</th>
+                <th>TVA</th>
+                <th>Total TTC</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ invoice.amountWithoutTax }} €</td>
+                <td>{{ invoice.taxAmount }} %</td>
+                <td>{{ invoice.totalAmount }} €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="invoice-total">
+        <p>Total TTC à payer : {{ invoice.totalAmount }} €</p>
+    </div>
+
+    <div><br></div>
+    <div><br></div>
+    <p>L'équipe Archistore</p>
+
+{% endblock %}
