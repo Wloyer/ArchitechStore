@@ -1,4 +1,5 @@
 <?php
+// src/Form/RegistrationFormType.php
 
 namespace App\Form;
 
@@ -65,11 +66,11 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => '06 12 34 56 78',
                     'maxlength' => 10,
-                    'pattern' => '[0-9]{10}', // HTML5 validation pattern
-                    'inputmode' => 'numeric', // Affiche un pavé numérique sur mobile
-                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57", // Empêche la saisie de caractères non numériques
+                    'pattern' => '[0-9]{10}',
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57",
                     'oninvalid' => "this.setCustomValidity('Veuillez entrer un numéro de téléphone à 10 chiffres.')",
-                    'oninput' => "this.setCustomValidity('')" // Réinitialise le message personnalisé après correction
+                    'oninput' => "this.setCustomValidity('')"
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone.']),
@@ -92,9 +93,9 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => '75000',
                     'maxlength' => 5,
-                    'pattern' => '[0-9]{5}', // HTML5 validation pattern
+                    'pattern' => '[0-9]{5}',
                     'inputmode' => 'numeric',
-                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57", // Empêche la saisie de caractères non numériques
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57",
                     'oninvalid' => "this.setCustomValidity('Veuillez entrer un code postal valide de 5 chiffres.')",
                     'oninput' => "this.setCustomValidity('')"
                 ],
@@ -126,6 +127,29 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue(['message' => 'Vous devez accepter les termes.']),
+                ],
+            ])
+            ->add('cardNumber', TextType::class, [
+                'label' => 'Numéro de carte',
+                'mapped' => false, // Ne pas mapper ce champ à l'entité User
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer le numéro de carte']),
+                    new Length(['min' => 16, 'max' => 16, 'exactMessage' => 'Le numéro de carte doit être de 16 chiffres']),
+                ],
+            ])
+            ->add('expirationDate', TextType::class, [
+                'label' => 'Date d\'expiration',
+                'mapped' => false, // Ne pas mapper ce champ à l'entité User
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer la date d\'expiration']),
+                ],
+            ])
+            ->add('cvc', TextType::class, [
+                'label' => 'CVC',
+                'mapped' => false, // Ne pas mapper ce champ à l'entité User
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer le CVC']),
+                    new Length(['min' => 3, 'max' => 3, 'exactMessage' => 'Le CVC doit être de 3 chiffres']),
                 ],
             ]);
     }

@@ -12,7 +12,8 @@
             <div class="col-md-6">
                 <h1 class="text-center mb-4">Créer un compte</h1>
 
-                {{ form_start(registrationForm, {'attr': {'class': 'form-horizontal'}}) }}
+                {{ form_start(registrationForm, {'attr': {'data-turbo': 'false', 'class': 'form-horizontal'}}) }}
+
 
                 <!-- Email field -->
                 <div class="form-group mb-3">
@@ -76,6 +77,51 @@
                     {{ form_widget(registrationForm.country, {'attr': {'class': 'form-control', 'placeholder': 'France'}}) }}
                     {{ form_errors(registrationForm.country, {'attr': {'class': 'text-danger'}}) }}
                 </div>
+
+                <h2 class="text-center mb-4">Informations de paiement</h2>
+
+                <!-- Card number field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.cardNumber, 'Numéro de carte', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.cardNumber, {
+                        'attr': {
+                            'class': 'form-control card-number-input',
+                            'placeholder': '1234 5678 9012 3456',
+                            'maxlength': 19,
+                            'data-type': 'card-number'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.cardNumber, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- Expiration date field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.expirationDate, 'Date d\'expiration (MM/YY)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.expirationDate, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'MM/YY',
+                            'maxlength': 5,
+                            'data-type': 'expiration-date'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.expirationDate, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
+                <!-- CVC field -->
+                <div class="form-group mb-3">
+                    {{ form_label(registrationForm.cvc, 'CVC', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.cvc, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '123',
+                            'maxlength': 3,
+                            'data-type': 'cvc'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.cvc, {'attr': {'class': 'text-danger'}}) }}
+                </div>
+
 
                 <!-- Agree Terms checkbox -->
                 <div class="form-group mb-4">

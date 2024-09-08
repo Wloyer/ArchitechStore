@@ -31,46 +31,68 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Encode the plain password
+            // Récupérer les informations de paiement
+            $cardNumber = $form->get('cardNumber')->getData();
+            $expirationDate = $form->get('expirationDate')->getData();
+            $cvc = $form->get('cvc')->getData();
+
+            // Valider le paiement
+            if (!$this->isPaymentValid($cardNumber, $expirationDate, $cvc)) {
+                $this->addFlash('error', 'Le paiement a échoué. Veuillez vérifier les informations de votre carte.');
+                return $this->redirectToRoute('app_register');
+            }
+
+            // Enregistrer l'utilisateur
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
             );
-
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Créer une transaction de paiement pour l'achat de stockage
+            // Créer la transaction
             $transaction = new Transaction();
             $transaction->setUserTransaction($user);
             $transaction->setAmount(20.00); // Montant fixe de 20€
             $transaction->setTransactionType('Storage Purchase');
             $transaction->setTransactionDate(new \DateTime());
-            $transaction->setStatus('pending'); // Statut initial 'pending'
+            $transaction->setStatus('completed');
 
             $entityManager->persist($transaction);
             $entityManager->flush();
 
-            // Envoyer un email de confirmation avec un lien de vérification
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('mailtrap@mail.com', 'mailtrap'))
-                    ->to($user->getEmail())
-                    ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
-
-            $this->addFlash('success', 'Your account has been created. Please check your email to confirm your address.');
-            // Rediriger vers la page de paiement
-            return $this->redirectToRoute('app_transaction', ['id' => $transaction->getId()]);
+            $this->addFlash('success', 'Votre compte a été créé et le paiement a été effectué avec succès.');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form,
+            'registrationForm' => $form->createView(),
         ]);
     }
+
+
+    private function isPaymentValid($cardNumber, $expirationDate, $cvc): bool
+    {
+        if (!preg_match('/^\d{16}$/', $cardNumber)) {
+            $this->addFlash('error', 'Le numéro de carte doit contenir exactement 16 chiffres.');
+            return false;
+        }
+
+        if (!preg_match('/^\d{2}\/\d{2}$/', $expirationDate)) {
+            $this->addFlash('error', 'La date d\'expiration doit être au format MM/YY.');
+            return false;
+        }
+
+        if (!preg_match('/^\d{3}$/', $cvc)) {
+            $this->addFlash('error', 'Le CVC doit contenir exactement 3 chiffres.');
+            return false;
+        }
+
+        return true;
+    }
+
 
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
