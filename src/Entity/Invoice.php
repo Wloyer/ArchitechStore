@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\InvoiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 class Invoice
@@ -26,17 +27,22 @@ class Invoice
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $totalAmount = null;
 
-    #[ORM\ManyToOne(inversedBy: 'invoices')]
+    // Relation ManyToOne avec l'entité User
+    // reminder : un utilisateur peut avoir plusieurs factures, mais chaque facture est associée à un seul utilisateur
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'invoices')] 
+    #[ORM\JoinColumn(nullable: false)] // Attention : la facture doit toujours avoir un utilisateur sinon erreur
     private ?User $UserInvoice = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     private ?Transaction $transactionInvoice = null;
 
+    // Getter et Setter pour l'ID de la facture
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Getter et Setter pour la date de la facture
     public function getInvoiceDate(): ?\DateTimeInterface
     {
         return $this->InvoiceDate;
@@ -49,6 +55,7 @@ class Invoice
         return $this;
     }
 
+    // Getter et Setter pour le montant hors taxe
     public function getAmountWithoutTax(): ?string
     {
         return $this->amountWithoutTax;
@@ -61,6 +68,7 @@ class Invoice
         return $this;
     }
 
+    // Getter et Setter pour le montant de la taxe
     public function getTaxAmount(): ?string
     {
         return $this->taxAmount;
@@ -73,6 +81,7 @@ class Invoice
         return $this;
     }
 
+    // Getter et Setter pour le montant total
     public function getTotalAmount(): ?string
     {
         return $this->totalAmount;
@@ -85,6 +94,7 @@ class Invoice
         return $this;
     }
 
+    // Getter et Setter pour l'utilisateur (relation ManyToOne)
     public function getUserInvoice(): ?User
     {
         return $this->UserInvoice;
@@ -97,6 +107,7 @@ class Invoice
         return $this;
     }
 
+    // Getter et Setter pour la transaction
     public function getTransactionInvoice(): ?Transaction
     {
         return $this->transactionInvoice;
@@ -108,4 +119,5 @@ class Invoice
 
         return $this;
     }
+
 }

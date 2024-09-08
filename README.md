@@ -62,7 +62,7 @@ bash
 
 Visitez http://localhost:8000 dans votre navigateur pour accéder à ArchiStore.
 
-
+------ NOTES POUR LA GESTION DES FICHIERS --------
 Pour l'ajout de fichier
 il faut savoir que php  des tailles par défaut, il faut donc modifier le fichier php.ini
 C:\wamp64\bin\apache\apacheX.X.X\bin\php.ini
@@ -72,3 +72,11 @@ post_max_size = 8M
 les modifier comme suit
 upload_max_filesize = 20G
 post_max_size = 20G
+
+
+-------- NOTES POUR GESTION DE LA FACTURE --------
+--> pour la modifiation de l'entité Invoice, lancer les commandes suivantes (cela permet d'ajouter les différences puis faire la migration) :
+php bin/console doctrine:migrations:diff
+php bin/console doctrine:migrations:migrate
+--> pour le téléchargement du PDF il faut installer le bundle suivant :
+composer require dompdf/dompdf

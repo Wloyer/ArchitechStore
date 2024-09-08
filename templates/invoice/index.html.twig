@@ -3,9 +3,37 @@
 {% block title %}Invoice index{% endblock %}
 
 {% block body %}
-    <h1>Invoice index</h1>
+    <h1>Vos factures</h1>
 
-    <table class="table">
+    <table>
+    <thead>
+        <tr>
+            <th>Facture N°</th>
+            <th>Date</th>
+            <th>Montant HT</th>
+            <th>Taxe</th>
+            <th>Montant TTC</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td>{{ invoice.id }}</td>
+            <td>{{ invoice.InvoiceDate|date('d/m/Y') }}</td>
+            <td>{{ invoice.amountWithoutTax }} €</td>
+            <td>{{ invoice.taxAmount }} %</td>
+            <td>{{ invoice.totalAmount }} €</td>
+            <td>
+                <a href="{{ path('app_invoice_download', {id: invoice.id}) }}">Télécharger la facture</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{#     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -37,5 +65,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_invoice_new') }}">Create new</a>
+    <a href="{{ path('app_invoice_new') }}">Create new</a> #}
 {% endblock %}
