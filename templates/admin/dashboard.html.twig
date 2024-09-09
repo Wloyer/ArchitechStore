@@ -9,8 +9,8 @@
         <p class="lead">Manage your site here.</p>
 
         <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-3">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">Users</h5>
                         <p class="card-text">Manage users, update roles, and more.</p>
@@ -19,37 +19,246 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-3">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">Files</h5>
                         <p class="card-text">Manage your other entities from here.</p>
-                        <a href="{{ path('app_file_index') }}" class="btn btn-primary">Manage Entities</a>
+                        <a href="{{ path('app_file_index') }}" class="btn btn-primary">Manage Files</a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-3">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">Invoices</h5>
                         <p class="card-text">Manage your other entities from here.</p>
-                        <a href="{{ path('app_invoice_index') }}" class="btn btn-primary">Manage Entities</a>
+                        <a href="{{ path('app_invoice_index') }}" class="btn btn-primary">Manage Invoices</a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-3">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Transaction</h5>
-                        <p class="card-text">Manage your other entities from here.</p>
-                        <a href="{{ path('app_file_transaction') }}" class="btn btn-primary">Manage Entities</a>
+                        <h5 class="card-title">Transactions</h5>
+                        <p class="card-text">Manage transactions from here.</p>
+                        <a href="{{ path('app_file_transaction') }}" class="btn btn-primary">Manage Transactions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques (graphiques) -->
+        <div class="row mt-4">
+            <!-- Statistiques des Transactions -->
+            <div class="col-lg-6 col-md-12">
+                <div class="card h-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistiques des Transactions</h5>
+                        <canvas id="transactionsChart"></canvas>
                     </div>
                 </div>
             </div>
 
+            <!-- Statistiques des Utilisateurs -->
+            <div class="col-lg-6 col-md-12">
+                <div class="card h-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistiques des Utilisateurs</h5>
+                        <p>Total des utilisateurs : {{ totalUsers }}</p>
+                        <p>Utilisateurs vérifiés : {{ verifiedUsers }}</p>
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Section pour les fichiers -->
+        <div class="row mt-4">
+            <div class="col-lg-6 col-md-12">
+                <div class="card h-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistiques des Fichiers</h5>
+                        <p>Total des fichiers : {{ totalFiles }}</p>
+                        <p>Taille totale des fichiers : {{ totalFileSize / 1024 / 1024 }} Mo</p>
+                        <canvas id="fileTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section pour l'utilisation de l'espace de stockage -->
+            <div class="col-lg-6 col-md-12">
+                <div class="card h-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Utilisation de l'espace de données</h5>
+                        <canvas id="storageChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <!-- Chart.js et l'adaptateur date pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- Script pour le graphique des transactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dates = {{ dates|json_encode|raw }};
+            const transactionsPerDate = {{ transactionsPerDate|json_encode|raw }};
+            const amountsPerDate = {{ amountsPerDate|json_encode|raw }};
+
+            const ctx = document.getElementById('transactionsChart').getContext('2d');
+            const transactionsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Nombre de transactions',
+                            data: transactionsPerDate,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: false,
+                        },
+                        {
+                            label: 'Montant total des transactions (€)',
+                            data: amountsPerDate,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { type: 'time', time: { unit: 'day' } },
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Script pour le graphique des utilisateurs
+            const userRegistrationLabels = {{ userRegistrationData|keys|json_encode|raw }};
+            const userRegistrations = {{ userRegistrationData|json_encode|raw }};
+
+            const ctx2 = document.getElementById('usersChart').getContext('2d');
+            const usersChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: userRegistrationLabels,
+                    datasets: [{
+                        label: 'Inscriptions par mois',
+                        data: userRegistrations,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Script pour le graphique de stockage
+            const totalStorage = {{ totalStorage }};
+            const usedStorage = {{ usedStorage }};
+            const freeStorage = {{ freeStorage }};
+
+            const ctx3 = document.getElementById('storageChart').getContext('2d');
+            const storageChart = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        `Espace utilisé : ${usedStorage} Go`,
+                        `Espace libre : ${freeStorage} Go`
+                    ],
+                    datasets: [{
+                        label: `Utilisation de l'espace de données sur un total de ${totalStorage} Go`,
+                        data: [usedStorage, freeStorage],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' Go';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            const fileTypeLabels = [
+                {% for fileType in fileTypeDistribution %}
+                "{{ fileType.type }}",
+                {% endfor %}
+            ];
+
+            const fileTypeData = [
+                {% for fileType in fileTypeDistribution %}
+                {{ fileType.count }},
+                {% endfor %}
+            ];
+
+            const ctx4 = document.getElementById('fileTypeChart').getContext('2d');
+            const fileTypeChart = new Chart(ctx4, {
+                type: 'pie',
+                data: {
+                    labels: fileTypeLabels,
+                    datasets: [{
+                        label: 'Répartition des types de fichiers',
+                        data: fileTypeData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+

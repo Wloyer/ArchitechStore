@@ -1,42 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}File{% endblock %}
+{% block title %}Détails du fichier{% endblock %}
 
 {% block body %}
-    <h1>File</h1>
+    <div class="container mt-5">
+        <h1 class="mb-4">Détails du fichier</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ file.id }}</td>
-            </tr>
-            <tr>
-                <th>File Name</th>
-                <td>{{ file.fileName }}</td>
-            </tr>
-            <tr>
-                <th>Size</th>
-                <td>{{ file.size / 1024 / 1024 }} MB</td>
-            </tr>
-            <tr>
-                <th>Upload Date</th>
-                <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ file.type }}</td>
-            </tr>
-            <tr>
-                <th>Path</th>
-                <td>{{ file.path }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Tableau des détails du fichier -->
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Id</th>
+                        <td>{{ file.id }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nom du fichier</th>
+                        <td>{{ file.fileName }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Taille</th>
+                        <td>{{ file.size / 1024 / 1024 }} MB</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Date de téléchargement</th>
+                        <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Type</th>
+                        <td>{{ file.type }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Chemin du fichier</th>
+                        <td>{{ file.path }}</td>
+                    </tr>
+                    </tbody>
+                </table>
 
-    <a href="{{ path('app_file_index') }}">back to list</a>
+                <!-- Boutons de retour et modification -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ path('app_file_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+                    <a href="{{ path('app_file_edit', {'id': file.id}) }}" class="btn btn-outline-primary">Modifier</a>
+                </div>
 
-    <a href="{{ path('app_file_edit', {'id': file.id}) }}">edit</a>
+                <!-- Formulaire de suppression -->
+                <div class="mt-3">
+                    {{ include('file/_delete_form.html.twig') }}
+                </div>
+            </div>
 
-    {{ include('file/_delete_form.html.twig') }}
+            <div class="col-md-6">
+                <!-- Prévisualisation de l'image si c'est une image -->
+                {% if file.type starts with 'image/' %}
+                    <h5 class="mb-3">Prévisualisation de l'image</h5>
+                    <!-- Utilisation du chemin complet stocké dans le champ "path" -->
+                    <img src="{{ asset('uploads/' ~ file.path) }}" alt="{{ file.fileName }}" class="img-fluid rounded">
+                {% else %}
+                    <div class="alert alert-info mt-3">
+                        Aucun aperçu disponible pour ce type de fichier.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

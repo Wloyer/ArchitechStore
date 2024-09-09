@@ -1,13 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit File{% endblock %}
+{% block title %}Modifier le fichier{% endblock %}
 
 {% block body %}
-    <h1>Edit File</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Modifier le fichier</h1>
 
-    {{ include('file/_form.html.twig', {'button_label': 'Update'}) }}
+        <!-- Formulaire de modification -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <!-- Afficher l'image actuelle si elle existe et est de type image -->
+                {% if file.type starts with 'image/' %}
+                    <h5 class="mb-3">Prévisualisation de l'image actuelle</h5>
+                    <img src="{{ asset('uploads/' ~ file.path) }}" alt="{{ file.fileName }}" class="img-fluid rounded mb-4" style="max-width: 300px;">
+                {% else %}
+                    <div class="alert alert-info mt-3">
+                        Aucun aperçu disponible pour ce type de fichier.
+                    </div>
+                {% endif %}
 
-    <a href="{{ path('app_file_index') }}">back to list</a>
+                <!-- Informations sur le fichier -->
+                <p class="mb-3">Nom du fichier : <strong>{{ file.fileName }}</strong></p>
+                <p class="mb-3">Taille : <strong>{{ file.size / 1024 / 1024 }} MB</strong></p>
+                <p class="mb-3">Type de fichier : <strong>{{ file.type }}</strong></p>
 
-    {{ include('file/_delete_form.html.twig') }}
+                <!-- Formulaire d'édition avec bouton stylisé -->
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button class="btn btn-primary btn-lg w-100 mt-4">{{ button_label|default('Mettre à jour') }}</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        <!-- Liens et boutons d'actions supplémentaires -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('app_file_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+
+            <!-- Formulaire de suppression avec bouton rouge -->
+            {{ include('file/_delete_form.html.twig', { 'button_class': 'btn btn-danger' }) }}
+        </div>
+    </div>
 {% endblock %}
