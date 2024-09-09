@@ -10,7 +10,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
                     </li>
-                    {% if app.user %}
+                    {% if app.user and is_granted('ROLE_ADMIN') %}
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_admin_dashboard') }}">Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
+                        </li>
+
+                    {% elseif app.user %}
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
                         </li>
@@ -28,6 +38,7 @@
                         </li>
 
                     {% else %}
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
                         </li>
@@ -35,11 +46,11 @@
                             <a class="nav-link" href="{{ path('app_register') }}">Inscription</a>
                         </li>
                     {% endif %}
-                    {% if app.user and is_granted('ROLE_ADMIN') %}
+                    {# {% if app.user and is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_admin_dashboard') }}">Admin</a>
                         </li>
-                    {% endif %}
+                    {% endif %} #}
 
 
                 </ul>

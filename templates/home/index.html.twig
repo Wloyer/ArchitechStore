@@ -7,7 +7,15 @@
     <div class="container-fluid p-5 bg-light text-center">
         <h1 class="display-4">Bienvenue chez ArchiStore</h1>
         <p class="lead">Votre solution de stockage sécurisée pour tous vos projets architecturaux</p>
-        <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg mt-3">Commencez dès maintenant</a>
+        <p>
+            {% if app.user and is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin_dashboard') }}" class="btn btn-primary btn-lg mt-3">Voir le Dashboard</a>
+            {% elseif app.user %}
+                <a href="{{ path('app_file_new') }}" class="btn btn-primary btn-lg mt-3">Ajoutez votre premier fichier</a>
+            {% else %}
+                <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg mt-3">Commencez dès maintenant</a>
+            {% endif %}
+        </p>
     </div>
 
 
@@ -35,7 +43,15 @@
     <div class="container-fluid p-5 bg-dark text-white text-center mt-5">
         <h2>Prêt à gérer vos projets de manière plus efficace ?</h2>
         <p>Rejoignez ArchiStore dès aujourd'hui et découvrez la puissance d'une solution de stockage adaptée aux architectes.</p>
-        <a href="{{ path('app_register') }}" class="btn btn-success btn-lg mt-3">Inscrivez-vous maintenant</a>
+        <p>
+            {% if app.user and is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin_dashboard') }}" class="btn btn-success btn-lg mt-3">Voir les commentaires des clients</a>
+            {% elseif app.user %}
+                <a href="{{ path('app_file_index') }}" class="btn btn-success btn-lg mt-3">Accédez à vos fichiers</a>
+            {% else %}
+                <a href="{{ path('app_register') }}" class="btn btn-success btn-lg mt-3">Inscrivez-vous maintenant</a>
+            {% endif %}
+        </p>
     </div>
     </div>
 {% endblock %}
