@@ -3,9 +3,19 @@
 {% block title %}Nouveau fichier{% endblock %}
 
 {% block body %}
-    <h1>Créer un nouveau fichier</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Créer un nouveau fichier</h1>
 
-    {{ include('file/_form.html.twig') }}
+        <!-- Formulaire de création dans une carte centrée -->
+        <div class="card mb-4">
+            <div class="card-body">
+                {{ include('file/_form.html.twig', {'button_label': 'Télécharger le fichier'}) }}
+            </div>
+        </div>
 
-    <a href="{{ path('app_file_index') }}">Retour à la liste</a>
+        <!-- Bouton de retour à la liste -->
+        <div class="text-center mt-4">
+            <a href="{{ path('app_file_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
+    </div>
 {% endblock %}

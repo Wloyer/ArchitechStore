@@ -1,82 +1,98 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
+{% block title %}Détails de l'utilisateur{% endblock %}
 
 {% block body %}
-    <h1>User</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Détails de l'utilisateur</h1>
 
-    <table class="table">
-        <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ user.id }}</td>
-        </tr>
-        <tr>
-            <th>LastName</th>
-            <td>{{ user.lastName }}</td>
-        </tr>
-        <tr>
-            <th>FirstName</th>
-            <td>{{ user.firstName }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ user.email }}</td>
-        </tr>
-        <tr>
-            <th>Password</th>
-            <td>{{ user.password }}</td>
-        </tr>
-        <tr>
-            <th>Phone_number</th>
-            <td>{{ user.phoneNumber }}</td>
-        </tr>
-        <tr>
-            <th>Address</th>
-            <td>{{ user.address }}</td>
-        </tr>
-        <tr>
-            <th>ZipCode</th>
-            <td>{{ user.zipCode }}</td>
-        </tr>
-        <tr>
-            <th>City</th>
-            <td>{{ user.City }}</td>
-        </tr>
-        <tr>
-            <th>Country</th>
-            <td>{{ user.Country }}</td>
-        </tr>
-        <tr>
-            <th>RegistrationDate</th>
-            <td>{{ user.registrationDate ? user.registrationDate|date('Y-m-d H:i:s') : '' }}</td>
-        </tr>
-        <tr>
-            <th>TotalStorageSpace</th>
-            <td>{{ user.totalStorageSpace }}</td>
-        </tr>
-        <tr>
-            <th>StorageLimit</th>
-            <td>{{ user.storageLimit }}</td>
-        </tr>
-        <tr>
-            <th>StorageUsed</th>
-            <td>{{ user.storageUsed }}</td>
-        </tr>
-        <tr>
-            <th>Role</th>
-            <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-        </tr>
-        <tr>
-            <th>UpdatedAt</th>
-            <td>{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-        </tr>
-        </tbody>
-    </table>
+        <!-- Tableau des détails de l'utilisateur -->
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Id</th>
+                        <td>{{ user.id }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nom</th>
+                        <td>{{ user.lastName }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Prénom</th>
+                        <td>{{ user.firstName }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Mot de passe</th>
+                        <td>{{ user.password }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Téléphone</th>
+                        <td>{{ user.phoneNumber }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Adresse</th>
+                        <td>{{ user.address }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Code postal</th>
+                        <td>{{ user.zipCode }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Ville</th>
+                        <td>{{ user.City }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pays</th>
+                        <td>{{ user.Country }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Date d'inscription</th>
+                        <td>{{ user.registrationDate ? user.registrationDate|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Espace total (Mo)</th>
+                        <td>{{ user.totalStorageSpace }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Limite de stockage (Mo)</th>
+                        <td>{{ user.storageLimit }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Espace utilisé (Mo)</th>
+                        <td>{{ user.storageUsed }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Rôles</th>
+                        <td>
+                            {% for role in user.roles %}
+                                {{ role }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Dernière mise à jour</th>
+                        <td>{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+        <!-- Boutons d'action -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-outline-primary">Modifier</a>
+        </div>
 
-    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
-
-    {{ include('user/_delete_form.html.twig') }}
+        <!-- Formulaire de suppression -->
+        <div class="mt-3">
+            {{ include('user/_delete_form.html.twig', { 'button_class': 'btn btn-danger' }) }}
+        </div>
+    </div>
 {% endblock %}

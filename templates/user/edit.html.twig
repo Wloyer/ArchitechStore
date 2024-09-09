@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}Modifier l'utilisateur{% endblock %}
 
 {% block body %}
     <div class="container mt-4">
-        <h1 class="mb-4">Edit User</h1>
+        <h1 class="text-center mb-4">Modifier l'utilisateur</h1>
 
+        <!-- Formulaire d'édition de l'utilisateur -->
         {{ form_start(form) }}
-
         <div class="row">
             <div class="col-md-6 mb-3">
                 {{ form_row(form.firstName) }}
@@ -59,18 +59,28 @@
             </div>
         </div>
 
+        <!-- Champ des rôles -->
         <div class="mb-3">
-            <label class="form-label">Roles</label>
+            <label class="form-label">Rôles</label>
             <div class="form-check">
                 {{ form_widget(form.roles) }}
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <!-- Boutons d'action -->
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary mx-2 w-25">Enregistrer</button>
+            <a href="{{ path('app_user_index') }}" class="btn btn-secondary mx-2 w-25 text-center">Retour à la liste</a>
+        </div>
+
         {{ form_end(form) }}
 
-        <a href="{{ path('app_user_index') }}" class="btn btn-secondary mt-3">Back to list</a>
-
-        {{ include('user/_delete_form.html.twig') }}
+        <!-- Formulaire de suppression avec bouton plus large -->
+        <div class="d-flex justify-content-center mt-4">
+            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');" class="w-50">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                <button class="btn btn-danger w-100">Supprimer</button>
+            </form>
+        </div>
     </div>
 {% endblock %}

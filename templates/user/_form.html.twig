@@ -1,4 +1,90 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+
+<!-- Champ pour le nom de famille -->
+<div class="mb-3">
+    {{ form_label(form.lastName, 'Nom de famille', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lastName) }}
+</div>
+
+<!-- Champ pour le prénom -->
+<div class="mb-3">
+    {{ form_label(form.firstName, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.firstName) }}
+</div>
+
+<!-- Champ pour l'email -->
+<div class="mb-3">
+    {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.email) }}
+</div>
+
+<!-- Champ pour le mot de passe -->
+<div class="mb-3">
+    {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.password) }}
+</div>
+
+<!-- Champ pour le numéro de téléphone -->
+<div class="mb-3">
+    {{ form_label(form.phone_number, 'Numéro de téléphone', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.phone_number, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.phone_number) }}
+</div>
+
+<!-- Champ pour l'adresse -->
+<div class="mb-3">
+    {{ form_label(form.address, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.address, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.address) }}
+</div>
+
+<!-- Champ pour le code postal -->
+<div class="mb-3">
+    {{ form_label(form.zipCode, 'Code postal', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.zipCode, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.zipCode) }}
+</div>
+
+<!-- Champ pour la ville -->
+<div class="mb-3">
+    {{ form_label(form.City, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.City, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.City) }}
+</div>
+
+<!-- Champ pour le pays -->
+<div class="mb-3">
+    {{ form_label(form.Country, 'Pays', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.Country, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.Country) }}
+</div>
+
+<!-- Champ pour l'espace total de stockage -->
+<div class="mb-3">
+    {{ form_label(form.totalStorageSpace, 'Espace total de stockage (Mo)', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.totalStorageSpace, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.totalStorageSpace) }}
+</div>
+
+<!-- Champ pour la limite de stockage -->
+<div class="mb-3">
+    {{ form_label(form.storageLimit, 'Limite de stockage (Mo)', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.storageLimit, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.storageLimit) }}
+</div>
+
+<!-- Champ pour les rôles -->
+<div class="mb-3">
+    {{ form_label(form.roles, 'Rôles', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.roles, {'attr': {'class': 'form-check'}}) }}
+    {{ form_errors(form.roles) }}
+</div>
+
+<!-- Bouton de soumission -->
+<button type="submit" class="btn btn-primary w-100">{{ button_label|default('Enregistrer') }}</button>
+
 {{ form_end(form) }}
