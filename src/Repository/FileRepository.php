@@ -110,6 +110,17 @@ class FileRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+    public function countFilesUploadedTodayByUser(User $user): int
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->select('count(f.id)')
+            ->where('f.user = :user')
+            ->andWhere('f.uploadDate >= :today')
+            ->setParameter('user', $user)
+            ->setParameter('today', new \DateTime('today'));
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 
 //    /**
 //     * @return File[] Returns an array of File objects

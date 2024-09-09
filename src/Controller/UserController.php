@@ -10,10 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Mime\Email;
 
 #[Route('/user')]
 class UserController extends AbstractController
@@ -140,20 +142,24 @@ class UserController extends AbstractController
             throw $this->createAccessDeniedException('Vous devez être connecté pour modifier votre profil.');
         }
 
+        // Créer le formulaire
         $form = $this->createForm(UserType::class, $user, ['is_admin' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer le nouveau mot de passe soumis
             $newPassword = $form->get('password')->getData();
             if ($newPassword) {
-                // Hacher le nouveau mot de passe et le sauvegarder
+                // Hacher le nouveau mot de passe et l'assigner à l'utilisateur
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
             }
 
+            // Mettre à jour l'utilisateur
             $user->setUpdatedAt(new \DateTime());
             $entityManager->flush();
 
+            // Message de succès
             $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
 
             return $this->redirectToRoute('app_user_profile');
@@ -166,7 +172,7 @@ class UserController extends AbstractController
 
     #[Route('/profil/delete', name: 'app_user_profile_delete', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function deleteProfile(Request $request, EntityManagerInterface $entityManager, AuthenticationUtils $authenticationUtils): Response
+    public function deleteProfile(Request $request, EntityManagerInterface $entityManager, FileRepository $fileRepository, UserRepository $userRepository, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
 
@@ -174,19 +180,82 @@ class UserController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
+            // Récupérer le nom et l'email avant suppression
+            $userName = $user->getFirstName() . ' ' . $user->getLastName();
+            $userEmail = $user->getEmail();
+
+            // Récupérer et supprimer les fichiers de l'utilisateur
+            $files = $fileRepository->findBy(['user' => $user]);
+            $fileCount = count($files); // Nombre de fichiers supprimés
+
+            foreach ($files as $file) {
+                // Supprimer le fichier du système de fichiers
+                $filePath = $this->getParameter('upload_directory') . '/' . $file->getPath();
+                if (file_exists($filePath)) {
+                    unlink($filePath); // Supprimer le fichier du disque
+                }
+
+                // Supprimer le fichier de la base de données
+                $entityManager->remove($file);
+            }
+
             // Supprimer l'utilisateur connecté
             $entityManager->remove($user);
             $entityManager->flush();
+
+            // Envoyer un email de confirmation à l'utilisateur
+            $this->sendConfirmationEmail($mailer, $userEmail, $userName);
+
+            // Envoyer une notification par email aux administrateurs
+            $this->notifyAdminsOfDeletion($mailer, $userName, $fileCount, $userRepository);
 
             // Invalider la session et déconnecter l'utilisateur
             $this->container->get('security.token_storage')->setToken(null);
             $request->getSession()->invalidate();
 
-            // Rediriger vers la page de connexion ou d'accueil
+            // Rediriger vers la page de déconnexion
             return $this->redirectToRoute('app_logout');
         }
 
         return $this->redirectToRoute('app_user_profile');
     }
+    private function sendConfirmationEmail(MailerInterface $mailer, string $userEmail, string $userName): void
+    {
+        $email = (new Email())
+            ->from('noreply@votre-site.com')
+            ->to($userEmail)
+            ->subject('Confirmation de suppression de votre compte')
+            ->html("
+            <p>Bonjour $userName,</p>
+            <p>Votre compte a été supprimé avec succès. Nous sommes désolés de vous voir partir.</p>
+            <p>Si vous avez des questions ou souhaitez revenir, n'hésitez pas à nous contacter.</p>
+            <p>Cordialement,<br>L'équipe de gestion des utilisateurs.</p>
+        ");
+
+        $mailer->send($email);
+    }
+    private function notifyAdminsOfDeletion(MailerInterface $mailer, string $userName, int $fileCount, UserRepository $userRepository): void
+    {
+        // Récupérer tous les administrateurs avec le rôle 'ROLE_ADMIN'
+        $adminEmails = $userRepository->findByRole('ROLE_ADMIN');
+
+        foreach ($adminEmails as $admin) {
+            $adminEmail = $admin->getEmail();
+
+            $email = (new Email())
+                ->from('noreply@votre-site.com')
+                ->to($adminEmail)
+                ->subject('Un utilisateur a supprimé son compte')
+                ->html("
+                <p>Bonjour,</p>
+                <p>Le client <strong>$userName</strong> a supprimé son compte.</p>
+                <p>Nombre de fichiers supprimés : <strong>$fileCount</strong></p>
+                <p>Cordialement,<br>L'équipe de gestion des utilisateurs.</p>
+            ");
+
+            $mailer->send($email);
+        }
+    }
+
 }
