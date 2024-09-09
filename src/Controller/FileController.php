@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\File as ConstraintsFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -21,13 +21,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class FileController extends AbstractController
 {
     #[Route('/', name: 'app_file_index', methods: ['GET', 'POST'])]
-    
-    /* public function index(FileRepository $fileRepository): Response
-    {
-        return $this->render('file/index.html.twig', [
-            'files' => $fileRepository->findAll(),
-        ]);
-    } */
     public function index(Request $request, FileRepository $fileRepository): Response
     {
         // Récupérer les valeurs de filtre et de tri depuis la requête
@@ -35,10 +28,16 @@ class FileController extends AbstractController
         $format = $request->query->get('format');
         $orderBy = $request->query->get('orderBy');
         $direction = $request->query->get('direction', 'ASC'); // 'ASC' par défaut
-    
+
         // Obtenir les fichiers filtrés/triés
-        $files = $fileRepository->findByFilters($name, $format, $orderBy, $direction);
-    
+        if ($this->isGranted('ROLE_ADMIN')) {
+            // Les administrateurs peuvent voir tous les fichiers
+            $files = $fileRepository->findByFilters($name, $format, $orderBy, $direction);
+        } else {
+            // Les utilisateurs normaux ne voient que leurs propres fichiers
+            $files = $fileRepository->findByUserAndFilters($this->getUser(), $name, $format, $orderBy, $direction);
+        }
+
         // Rendre la vue avec les fichiers et les paramètres de filtre/tri
         return $this->render('file/index.html.twig', [
             'files' => $files,
@@ -54,34 +53,34 @@ class FileController extends AbstractController
     {
         $file = new File();
         $form = $this->createForm(FileType::class, $file);
-    
+
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $uploadedFile */
             $uploadedFile = $form->get('attachment')->getData();
-    
+
             if ($uploadedFile) {
                 // Vérifier si l'objet UploadedFile est valide
                 if (!$uploadedFile->isValid()) {
                     throw new \Exception('Le fichier n\'a pas été uploadé correctement.');
                 }
-            
+
                 // Récupérer le nom du fichier original
                 $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            
+
                 // Obtenir la taille et le type MIME avant de déplacer le fichier
                 $fileSize = $uploadedFile->getSize();
                 $mimeType = $uploadedFile->getMimeType();
-            
+
                 if ($fileSize === false) {
                     throw new \Exception('Impossible de récupérer la taille du fichier.');
                 }
-            
+
                 // Générer un nom de fichier sécurisé
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
-            
+
                 try {
                     // Déplacer le fichier vers le répertoire de destination
                     $uploadedFile->move(
@@ -91,18 +90,21 @@ class FileController extends AbstractController
                 } catch (FileException $e) {
                     throw new \Exception('Le téléchargement du fichier a échoué : ' . $e->getMessage());
                 }
-            
+
                 // Définir les attributs de l'entité File
                 $file->setFileName($originalFilename);
                 $file->setSize($fileSize);  // Utilise la taille obtenue avant le déplacement
                 $file->setUploadDate(new \DateTime());
                 $file->setType($mimeType);  // Utilise le type MIME obtenu avant le déplacement
                 $file->setPath($newFilename);
-            
+
+                // Associer l'utilisateur connecté au fichier
+                $file->setUser($this->getUser()); // Ajout de cette ligne
+
                 // Sauvegarder l'entité dans la base de données
                 $entityManager->persist($file);
                 $entityManager->flush();
-            
+
                 return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
             }
         }
@@ -116,6 +118,11 @@ class FileController extends AbstractController
     #[Route('/{id}', name: 'app_file_show', methods: ['GET'])]
     public function show(File $file): Response
     {
+        // Vérifier que l'utilisateur connecté est bien le propriétaire du fichier ou un admin
+        if ($file->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas voir ce fichier.');
+        }
+
         return $this->render('file/show.html.twig', [
             'file' => $file,
         ]);
@@ -123,74 +130,86 @@ class FileController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_file_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, File $file, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
-{
-    $form = $this->createForm(FileType::class, $file);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        /** @var UploadedFile $uploadedFile */
-        $uploadedFile = $form->get('attachment')->getData();
-
-        if ($uploadedFile) {
-            // Vérifier si l'objet UploadedFile est valide
-            if (!$uploadedFile->isValid()) {
-                throw new \Exception('Le fichier n\'a pas été uploadé correctement.');
-            }
-
-            // Récupérer le nom du fichier original
-            $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-
-            // Obtenir la taille et le type MIME avant de déplacer le fichier
-            $fileSize = $uploadedFile->getSize();
-            $mimeType = $uploadedFile->getMimeType();
-
-            if ($fileSize === false) {
-                throw new \Exception('Impossible de récupérer la taille du fichier.');
-            }
-
-            // Générer un nom de fichier sécurisé
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
-
-            try {
-                // Déplacer le fichier vers le répertoire de destination
-                $uploadedFile->move(
-                    $this->getParameter('upload_directory'),
-                    $newFilename
-                );
-
-                // Supprimer l'ancien fichier si nécessaire
-                $oldFilePath = $this->getParameter('upload_directory') . '/' . $file->getPath();
-                if (file_exists($oldFilePath)) {
-                    unlink($oldFilePath);
-                }
-
-                // Mettre à jour les attributs du fichier dans l'entité
-                $file->setFileName($originalFilename);
-                $file->setSize($fileSize);  // Utilise la taille obtenue avant le déplacement
-                $file->setType($mimeType);  // Utilise le type MIME obtenu avant le déplacement
-                $file->setPath($newFilename);
-
-            } catch (FileException $e) {
-                throw new \Exception('Le téléchargement du fichier a échoué : ' . $e->getMessage());
-            }
+    {
+        // Vérifier que l'utilisateur connecté est bien le propriétaire du fichier ou un admin
+        if ($file->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce fichier.');
         }
 
-        $entityManager->flush();
+        $form = $this->createForm(FileType::class, $file);
+        $form->handleRequest($request);
 
-        return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $uploadedFile */
+            $uploadedFile = $form->get('attachment')->getData();
+
+            if ($uploadedFile) {
+                // Vérifier si l'objet UploadedFile est valide
+                if (!$uploadedFile->isValid()) {
+                    throw new \Exception('Le fichier n\'a pas été uploadé correctement.');
+                }
+
+                // Récupérer le nom du fichier original
+                $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+
+                // Obtenir la taille et le type MIME avant de déplacer le fichier
+                $fileSize = $uploadedFile->getSize();
+                $mimeType = $uploadedFile->getMimeType();
+
+                // Générer un nom de fichier sécurisé
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+
+                try {
+                    // Déplacer le fichier vers le répertoire de destination
+                    $uploadedFile->move(
+                        $this->getParameter('upload_directory'),
+                        $newFilename
+                    );
+
+                    // Supprimer l'ancien fichier si nécessaire
+                    $oldFilePath = $this->getParameter('upload_directory') . '/' . $file->getPath();
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+
+                    // Mettre à jour les attributs du fichier dans l'entité
+                    $file->setFileName($originalFilename);
+                    $file->setSize($fileSize);  // Utilise la taille obtenue avant le déplacement
+                    $file->setType($mimeType);  // Utilise le type MIME obtenu avant le déplacement
+                    $file->setPath($newFilename);
+                } catch (FileException $e) {
+                    throw new \Exception('Le téléchargement du fichier a échoué : ' . $e->getMessage());
+                }
+            }
+
+            // Mise à jour des autres informations du fichier
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('file/edit.html.twig', [
+            'file' => $file,
+            'form' => $form,
+        ]);
     }
-
-    return $this->render('file/edit.html.twig', [
-        'file' => $file,
-        'form' => $form,
-    ]);
-}
-
     #[Route('/{id}', name: 'app_file_delete', methods: ['POST'])]
     public function delete(Request $request, File $file, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$file->getId(), $request->getPayload()->getString('_token'))) {
+        // Vérifier que l'utilisateur connecté est bien le propriétaire du fichier ou un admin
+        if ($file->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce fichier.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$file->getId(), $request->get('_token'))) {
+            // Supprimer le fichier du système de fichiers
+            $filePath = $this->getParameter('upload_directory') . '/' . $file->getPath();
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            // Supprimer l'entité de la base de données
             $entityManager->remove($file);
             $entityManager->flush();
         }
@@ -210,6 +229,16 @@ class FileController extends AbstractController
         ]);
     }
 
+    #[Route('/my-files', name: 'app_user_files', methods: ['GET'])]
+    public function userFiles(FileRepository $fileRepository): Response
+    {
+        $user = $this->getUser(); // Récupérer l'utilisateur connecté
 
+        // Obtenir uniquement les fichiers de l'utilisateur connecté
+        $files = $fileRepository->findBy(['user' => $user]);
 
+        return $this->render('file/user_files.html.twig', [
+            'files' => $files,
+        ]);
+    }
 }

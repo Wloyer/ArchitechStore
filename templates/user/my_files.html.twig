@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes fichiers{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Mes fichiers</h1>
+
+        <!-- Tableau des fichiers -->
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom du fichier</th>
+                <th>Taille</th>
+                <th>Date de téléchargement</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+                <tr>
+                    <td>{{ file.id }}</td>
+                    <td>{{ file.fileName }}</td>
+                    <td>{{ file.size / 1024 / 1024 }} MB</td>
+                    <td>{{ file.uploadDate ? file.uploadDate|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ file.type }}</td>
+                    <td>
+                        <a href="{{ path('app_file_show', {'id': file.id}) }}" class="btn btn-secondary btn-sm">Voir</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucun fichier trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

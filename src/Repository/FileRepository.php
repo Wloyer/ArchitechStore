@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\File;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -75,6 +76,39 @@ class FileRepository extends ServiceEntityRepository
             ->setParameter('today', $today)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+    /**
+     * Méthode pour trouver les fichiers d'un utilisateur avec des filtres optionnels
+     *
+     * @param User $user
+     * @param string|null $name
+     * @param string|null $format
+     * @param string|null $orderBy
+     * @param string $direction
+     *
+     * @return File[]
+     */
+    public function findByUserAndFilters(User $user, ?string $name = null, ?string $format = null, ?string $orderBy = null, string $direction = 'ASC'): array
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->where('f.user = :user')
+            ->setParameter('user', $user);
+
+        if ($name) {
+            $qb->andWhere('f.fileName LIKE :name')
+                ->setParameter('name', '%' . $name . '%');
+        }
+
+        if ($format) {
+            $qb->andWhere('f.type = :format')
+                ->setParameter('format', $format);
+        }
+
+        if ($orderBy) {
+            $qb->orderBy('f.' . $orderBy, $direction);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

@@ -1,0 +1,36 @@
+{# templates/user/profile.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card w-75">
+            <div class="card-body">
+                <h1 class="text-center mb-4">Mon profil</h1>
+
+                <ul class="list-group mb-4">
+                    <li class="list-group-item"><strong>Email :</strong> {{ user.email }}</li>
+                    <li class="list-group-item"><strong>Nom :</strong> {{ user.lastName }}</li>
+                    <li class="list-group-item"><strong>Prénom :</strong> {{ user.firstName }}</li>
+                    <li class="list-group-item"><strong>Téléphone :</strong> {{ user.phoneNumber }}</li>
+                    <li class="list-group-item"><strong>Adresse :</strong> {{ user.address }}</li>
+                    <!-- Ajouter d'autres champs si nécessaire -->
+                </ul>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <a href="{{ path('app_user_profile_edit') }}" class="btn btn-primary w-45">Modifier</a>
+                    <form method="post" action="{{ path('app_user_profile_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ?');" class="w-45">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                        <button class="btn btn-danger w-100">Supprimer mon compte</button>
+                    </form>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <a href="{{ path('app_user_profile') }}" class="btn btn-secondary w-50">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
