@@ -29,8 +29,9 @@ class File
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\ManyToOne(inversedBy: 'files')]
-    private ?User $UserFile = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'files')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null; // Modification ici : le champ doit être "user"
 
     public function getId(): ?int
     {
@@ -97,15 +98,16 @@ class File
         return $this;
     }
 
-    public function getUserFile(): ?User
+    public function getUser(): ?User
     {
-        return $this->UserFile;
+        return $this->user;
     }
 
-    public function setUserFile(?User $UserFile): static
+    public function setUser(?User $user): static
     {
-        $this->UserFile = $UserFile;
+        $this->user = $user;
 
         return $this;
     }
+
 }

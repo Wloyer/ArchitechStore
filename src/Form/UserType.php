@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -28,9 +29,14 @@ class UserType extends AbstractType
                 'label' => 'Email',
                 'label_attr' => ['class' => 'form-label'],
             ])
-            ->add('password', null, [
-                'attr' => ['class' => 'form-control'],
-                'label' => 'Password',
+            ->add('password', PasswordType::class, [
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'id' => 'password-field',  // ID utilisé pour afficher/masquer le mot de passe
+                    'placeholder' => 'Laissez vide pour ne pas changer de mot de passe'
+                ],
+                'label' => 'Mot de passe',
                 'label_attr' => ['class' => 'form-label'],
             ])
             ->add('phone_number', null, [
@@ -57,34 +63,39 @@ class UserType extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Country',
                 'label_attr' => ['class' => 'form-label'],
-            ])
-            ->add('totalStorageSpace', null, [
-                'attr' => ['class' => 'form-control'],
-                'label' => 'Total Storage Space',
-                'label_attr' => ['class' => 'form-label'],
-            ])
-            ->add('storageLimit', null, [
-                'attr' => ['class' => 'form-control'],
-                'label' => 'Storage Limit',
-                'label_attr' => ['class' => 'form-label'],
-            ])
-            ->add('roles', ChoiceType::class, [
-                'choices' => [
-                    'Admin' => 'ROLE_ADMIN',
-                    'User' => 'ROLE_USER',
-                ],
-                'multiple' => true,
-                'expanded' => true,
-                'label' => 'Roles',
-                'label_attr' => ['class' => 'form-label'],
-                'attr' => ['class' => 'form-check-inline'],
             ]);
+
+        if ($options['is_admin']) {
+            $builder
+                ->add('totalStorageSpace', null, [
+                    'attr' => ['class' => 'form-control'],
+                    'label' => 'Total Storage Space',
+                    'label_attr' => ['class' => 'form-label'],
+                ])
+                ->add('storageLimit', null, [
+                    'attr' => ['class' => 'form-control'],
+                    'label' => 'Storage Limit',
+                    'label_attr' => ['class' => 'form-label'],
+                ])
+                ->add('roles', ChoiceType::class, [
+                    'choices' => [
+                        'Admin' => 'ROLE_ADMIN',
+                        'User' => 'ROLE_USER',
+                    ],
+                    'multiple' => true,
+                    'expanded' => true,
+                    'label' => 'Roles',
+                    'label_attr' => ['class' => 'form-label'],
+                    'attr' => ['class' => 'form-check-inline'],
+                ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'is_admin' => false,
         ]);
     }
 }

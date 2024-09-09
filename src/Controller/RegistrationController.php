@@ -63,6 +63,14 @@ class RegistrationController extends AbstractController
             $entityManager->persist($transaction);
             $entityManager->flush();
 
+            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+                (new TemplatedEmail())
+                    ->from(new Address('mailtrap@mail.com', 'mailtrap'))
+                    ->to($user->getEmail())
+                    ->subject('Please Confirm your Email')
+                    ->htmlTemplate('registration/confirmation_email.html.twig')
+            );
+
             $this->addFlash('success', 'Votre compte a été créé et le paiement a été effectué avec succès.');
             return $this->redirectToRoute('app_home');
         }
