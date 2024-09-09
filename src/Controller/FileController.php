@@ -220,12 +220,32 @@ class FileController extends AbstractController
     #[Route('/file/stats', name: 'app_file_stats', methods: ['GET'])]
     public function stats(FileRepository $fileRepository): Response
     {
-        $totalFiles = $fileRepository->countTotalFiles();
-        $filesToday = $fileRepository->countFilesUploadedToday();
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
+
+        // Récupérer les fichiers de l'utilisateur
+        $files = $fileRepository->findBy(['user' => $user]);
+
+        // Calculer l'utilisation de stockage
+        $totalFileSize = array_reduce($files, function ($total, $file) {
+            return $total + $file->getSize();
+        }, 0);
+
+        // Utilisation du stockage (en Mo)
+        $totalStorage = $user->getTotalStorageSpace(); // Espace de stockage total en Mo (défini pour l'utilisateur)
+        $usedStorage = $totalFileSize / 1024 / 1024;   // Convertir la taille totale des fichiers en Mo
+        $freeStorage = $totalStorage - $usedStorage;   // Espace de stockage restant
+
+        // Nombre total de fichiers
+        $totalFiles = count($files);
 
         return $this->render('file/stats.html.twig', [
             'totalFiles' => $totalFiles,
-            'filesToday' => $filesToday,
+            'filesToday' => $fileRepository->countFilesUploadedTodayByUser($user), // Méthode personnalisée pour obtenir les fichiers uploadés aujourd'hui
+            'totalFileSize' => $totalFileSize,
+            'totalStorage' => $totalStorage,
+            'usedStorage' => $usedStorage,
+            'freeStorage' => $freeStorage,
         ]);
     }
 
@@ -241,4 +261,6 @@ class FileController extends AbstractController
             'files' => $files,
         ]);
     }
+
+
 }

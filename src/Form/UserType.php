@@ -31,13 +31,12 @@ class UserType extends AbstractType
             ])
             ->add('password', PasswordType::class, [
                 'required' => false,
+                'mapped' => false,  // Ne pas mapper directement à l'entité User
                 'attr' => [
                     'class' => 'form-control',
-                    'id' => 'password-field',  // ID utilisé pour afficher/masquer le mot de passe
-                    'placeholder' => 'Laissez vide pour ne pas changer de mot de passe'
+                    'placeholder' => 'Laissez vide si vous ne souhaitez pas changer votre mot de passe',
                 ],
                 'label' => 'Mot de passe',
-                'label_attr' => ['class' => 'form-label'],
             ])
             ->add('phone_number', null, [
                 'attr' => ['class' => 'form-control'],
