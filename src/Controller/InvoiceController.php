@@ -65,6 +65,20 @@ class InvoiceController extends AbstractController
         ]);
     }
 
+    #[Route('/my-invoices', name: 'app_my_invoices', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')] // Seuls les utilisateurs connectés peuvent accéder
+    public function myInvoices(InvoiceRepository $invoiceRepository): Response
+    {
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
+
+        // Récupérer les factures de cet utilisateur
+        $invoices = $invoiceRepository->findBy(['userInvoice' => $user]);
+
+        return $this->render('invoice/my_invoices.html.twig', [
+            'invoices' => $invoices,
+        ]);
+    }
     /* 
     #[Route('/new', name: 'app_invoice_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

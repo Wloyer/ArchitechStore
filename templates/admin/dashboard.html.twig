@@ -49,7 +49,9 @@
                 </div>
             </div>
         </div>
-
+        <div class="alert alert-info mt-3" role="alert">
+            Si les statistiques ne s'affichent pas correctement, veuillez rafraîchir la page.
+        </div>
         <!-- Statistiques (graphiques) -->
         <div class="row mt-4">
             <!-- Statistiques des Transactions -->
@@ -179,11 +181,11 @@
                 type: 'doughnut',
                 data: {
                     labels: [
-                        `Espace utilisé : ${usedStorage} Go`,
-                        `Espace libre : ${freeStorage} Go`
+                        `Espace utilisé : ${usedStorage} Mo`,
+                        `Espace libre : ${freeStorage} Mo`
                     ],
                     datasets: [{
-                        label: `Utilisation de l'espace de données sur un total de ${totalStorage} Go`,
+                        label: `Utilisation de l'espace de données sur un total de ${totalStorage} Mo`,
                         data: [usedStorage, freeStorage],
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
@@ -205,7 +207,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(tooltipItem) {
-                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' Go';
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' Mo';
                                 }
                             }
                         }
