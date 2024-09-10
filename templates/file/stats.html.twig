@@ -9,23 +9,31 @@
         <div class="row">
             <!-- Nombre de fichiers -->
             <div class="col-lg-6 col-md-12">
-                <div class="card h-100 mb-3 d-flex  justify-content-center">
+                <div class="card h-100 mb-3 d-flex justify-content-center">
                     <div class="card-body text-center">
                         <h5 class="card-title">Nombre total de fichiers</h5>
                         <p>{{ totalFiles }}</p>
+                        <h5 class="card-title">Espace de stockage disponible</h5>
+                        <p>{{ freeStorage }}</p>
+                        <h5 class="card-title">Espace de stockage utilisé</h5>
+                        <p>{{ usedStorage }}</p>
                     </div>
                 </div>
             </div>
-
             <!-- Espace de stockage utilisé -->
             <div class="col-lg-6 col-md-12">
                 <div class="card h-100 mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Utilisation de l'espace de stockage</h5>
+                        <h5 class="card-title text-center">Utilisation de l'espace de stockage</h5>
                         <canvas id="storageChart"></canvas>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Message si le graphique ne s'affiche pas correctement -->
+        <div class="alert alert-info mt-3" role="alert">
+            Si les statistiques ne s'affichent pas correctement, veuillez rafraîchir la page.
         </div>
 
         <a href="{{ path('app_file_index') }}" class="btn btn-secondary mt-3">Retour à la liste des fichiers</a>
@@ -45,16 +53,20 @@
             const usedStorage = {{ usedStorage }};
             const freeStorage = {{ freeStorage }};
 
+            console.log('Total Storage:', totalStorage);
+            console.log('Used Storage:', usedStorage);
+            console.log('Free Storage:', freeStorage);
+
             const ctx = document.getElementById('storageChart').getContext('2d');
             const storageChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: [
-                        `Espace utilisé : ${usedStorage.toFixed(2)} Mo`,
-                        `Espace libre : ${freeStorage.toFixed(2)} Mo`
+                        `Espace utilisé : ${parseFloat(usedStorage).toFixed(2)} Mo`,
+                        `Espace libre : ${parseFloat(freeStorage).toFixed(2)} Mo`
                     ],
                     datasets: [{
-                        label: 'Utilisation de l\'espace de données',
+                        label: 'Utilisation de l\'espace de stockage',
                         data: [usedStorage, freeStorage],
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
@@ -76,7 +88,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(tooltipItem) {
-                                    return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + ' Mo';
+                                    return tooltipItem.label + ': ' + parseFloat(tooltipItem.raw).toFixed(2) + ' Mo';
                                 }
                             }
                         }

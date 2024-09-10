@@ -1,5 +1,4 @@
 <?php
-// src/Controller/StorageController.php
 
 namespace App\Controller;
 
@@ -14,25 +13,25 @@ class StorageController extends AbstractController
     #[IsGranted('ROLE_USER')]  // Seuls les utilisateurs connectés peuvent accéder
     public function index(): Response
     {
-        // Définir les plans
+        // Plans mis à jour avec le tarif de 20€ pour 20 Go
         $plans = [
             [
-                'name' => 'Plan de Base',
-                'price' => 5.00,
-                'storage' => '10 Go',
-                'description' => 'Ajoutez 10 Go d\'espace de stockage pour gérer vos fichiers.'
-            ],
-            [
-                'name' => 'Plan Standard',
-                'price' => 10.00,
-                'storage' => '50 Go',
-                'description' => 'Ajoutez 50 Go d\'espace de stockage pour vos projets plus importants.'
-            ],
-            [
-                'name' => 'Plan Premium',
+                'name' => '20 Go supplémentaires',
                 'price' => 20.00,
-                'storage' => '200 Go',
-                'description' => 'Profitez de 200 Go de stockage pour tous vos besoins d\'entreprise.'
+                'storage' => '20 Go',
+                'description' => 'Ajoutez 20 Go d\'espace de stockage supplémentaire.'
+            ],
+            [
+                'name' => '40 Go supplémentaires',
+                'price' => 40.00,
+                'storage' => '40 Go',
+                'description' => 'Ajoutez 40 Go d\'espace de stockage supplémentaire.'
+            ],
+            [
+                'name' => '60 Go supplémentaires',
+                'price' => 60.00,
+                'storage' => '60 Go',
+                'description' => 'Ajoutez 60 Go d\'espace de stockage supplémentaire.'
             ],
         ];
 

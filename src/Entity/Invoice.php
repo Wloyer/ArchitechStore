@@ -16,98 +16,92 @@ class Invoice
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $InvoiceDate = null;
+    private ?\DateTimeInterface $invoiceDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $amountWithoutTax = null;
+    private ?float $amountWithoutTax = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $taxAmount = null;
+    private ?float $taxAmount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $totalAmount = null;
+    private ?float $totalAmount = null;
 
     // Relation ManyToOne avec l'entité User
-    // reminder : un utilisateur peut avoir plusieurs factures, mais chaque facture est associée à un seul utilisateur
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'invoices')] 
-    #[ORM\JoinColumn(nullable: false)] // Attention : la facture doit toujours avoir un utilisateur sinon erreur
-    private ?User $UserInvoice = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'invoices')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $userInvoice = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     private ?Transaction $transactionInvoice = null;
 
-    // Getter et Setter pour l'ID de la facture
+    // Getters et Setters
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    // Getter et Setter pour la date de la facture
     public function getInvoiceDate(): ?\DateTimeInterface
     {
-        return $this->InvoiceDate;
+        return $this->invoiceDate;
     }
 
-    public function setInvoiceDate(\DateTimeInterface $InvoiceDate): static
+    public function setInvoiceDate(\DateTimeInterface $invoiceDate): static
     {
-        $this->InvoiceDate = $InvoiceDate;
+        $this->invoiceDate = $invoiceDate;
 
         return $this;
     }
 
-    // Getter et Setter pour le montant hors taxe
-    public function getAmountWithoutTax(): ?string
+    public function getAmountWithoutTax(): ?float
     {
         return $this->amountWithoutTax;
     }
 
-    public function setAmountWithoutTax(string $amountWithoutTax): static
+    public function setAmountWithoutTax(float $amountWithoutTax): static
     {
         $this->amountWithoutTax = $amountWithoutTax;
 
         return $this;
     }
 
-    // Getter et Setter pour le montant de la taxe
-    public function getTaxAmount(): ?string
+    public function getTaxAmount(): ?float
     {
         return $this->taxAmount;
     }
 
-    public function setTaxAmount(string $taxAmount): static
+    public function setTaxAmount(float $taxAmount): static
     {
         $this->taxAmount = $taxAmount;
 
         return $this;
     }
 
-    // Getter et Setter pour le montant total
-    public function getTotalAmount(): ?string
+    public function getTotalAmount(): ?float
     {
         return $this->totalAmount;
     }
 
-    public function setTotalAmount(string $totalAmount): static
+    public function setTotalAmount(float $totalAmount): static
     {
         $this->totalAmount = $totalAmount;
 
         return $this;
     }
 
-    // Getter et Setter pour l'utilisateur (relation ManyToOne)
     public function getUserInvoice(): ?User
     {
-        return $this->UserInvoice;
+        return $this->userInvoice;
     }
 
-    public function setUserInvoice(?User $UserInvoice): static
+    public function setUserInvoice(?User $userInvoice): static
     {
-        $this->UserInvoice = $UserInvoice;
+        $this->userInvoice = $userInvoice;
 
         return $this;
     }
 
-    // Getter et Setter pour la transaction
     public function getTransactionInvoice(): ?Transaction
     {
         return $this->transactionInvoice;
@@ -119,5 +113,4 @@ class Invoice
 
         return $this;
     }
-
 }

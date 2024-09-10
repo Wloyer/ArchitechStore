@@ -61,57 +61,70 @@ class FileController extends AbstractController
             $uploadedFile = $form->get('attachment')->getData();
 
             if ($uploadedFile) {
-                // Vérifier si l'objet UploadedFile est valide
                 if (!$uploadedFile->isValid()) {
-                    throw new \Exception('Le fichier n\'a pas été uploadé correctement.');
+                    $this->addFlash('error', 'Le fichier n\'a pas été uploadé correctement.');
+                    return $this->redirectToRoute('app_file_new');
                 }
 
-                // Récupérer le nom du fichier original
                 $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-
-                // Obtenir la taille et le type MIME avant de déplacer le fichier
-                $fileSize = $uploadedFile->getSize();
+                $fileSizeInBytes = $uploadedFile->getSize();
+                $fileSizeInMb = $fileSizeInBytes / (1024 * 1024); // Conversion en Mo
                 $mimeType = $uploadedFile->getMimeType();
 
-                if ($fileSize === false) {
-                    throw new \Exception('Impossible de récupérer la taille du fichier.');
+                $user = $this->getUser();
+                if (!$user) {
+                    throw new \Exception('Utilisateur non connecté.');
                 }
 
-                // Générer un nom de fichier sécurisé
+                $storageUsedInMb = $user->getStorageUsed();
+                $storageLimitInMb = $user->getStorageLimit();
+                $totalStorageSpaceInMb = $user->getTotalStorageSpace();
+
+                // Vérifier si l'utilisateur a assez d'espace de stockage
+                if ($totalStorageSpaceInMb < $fileSizeInMb) {
+                    $this->addFlash('error', 'Espace de stockage insuffisant. Veuillez acheter plus d\'espace de stockage.');
+                    return $this->redirectToRoute('app_file_new');
+                }
+
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
 
                 try {
-                    // Déplacer le fichier vers le répertoire de destination
                     $uploadedFile->move(
                         $this->getParameter('upload_directory'),
                         $newFilename
                     );
+
+                    $file->setFileName($originalFilename);
+                    $file->setSize($fileSizeInMb);
+                    $file->setUploadDate(new \DateTime());
+                    $file->setType($mimeType);
+                    $file->setPath($newFilename);
+                    $file->setUser($user);
+
+                    // Mettre à jour le stockage utilisé et l'espace total restant
+                    $newStorageUsed = $storageUsedInMb + $fileSizeInMb;
+                    $newTotalStorageSpace = $storageLimitInMb - $newStorageUsed;
+
+                    $user->setStorageUsed($newStorageUsed);
+                    $user->setTotalStorageSpace($newTotalStorageSpace);
+
+                    $entityManager->persist($file);
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+
+                    $this->addFlash('success', 'Le fichier a été uploadé avec succès.');
+                    return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
                 } catch (FileException $e) {
-                    throw new \Exception('Le téléchargement du fichier a échoué : ' . $e->getMessage());
+                    $this->addFlash('error', 'Le téléchargement du fichier a échoué : ' . $e->getMessage());
+                    return $this->redirectToRoute('app_file_new');
                 }
-
-                // Définir les attributs de l'entité File
-                $file->setFileName($originalFilename);
-                $file->setSize($fileSize);  // Utilise la taille obtenue avant le déplacement
-                $file->setUploadDate(new \DateTime());
-                $file->setType($mimeType);  // Utilise le type MIME obtenu avant le déplacement
-                $file->setPath($newFilename);
-
-                // Associer l'utilisateur connecté au fichier
-                $file->setUser($this->getUser()); // Ajout de cette ligne
-
-                // Sauvegarder l'entité dans la base de données
-                $entityManager->persist($file);
-                $entityManager->flush();
-
-                return $this->redirectToRoute('app_file_index', [], Response::HTTP_SEE_OTHER);
             }
         }
 
         return $this->render('file/new.html.twig', [
             'file' => $file,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -226,28 +239,30 @@ class FileController extends AbstractController
         // Récupérer les fichiers de l'utilisateur
         $files = $fileRepository->findBy(['user' => $user]);
 
-        // Calculer l'utilisation de stockage
-        $totalFileSize = array_reduce($files, function ($total, $file) {
-            return $total + $file->getSize();
+        // Calculer l'utilisation de stockage (les tailles sont déjà en Mo)
+        $totalFileSizeInMb = array_reduce($files, function ($total, $file) {
+            return $total + $file->getSize();  // Les tailles sont déjà en Mo dans la base de données
         }, 0);
 
-        // Utilisation du stockage (en Mo)
-        $totalStorage = $user->getTotalStorageSpace(); // Espace de stockage total en Mo (défini pour l'utilisateur)
-        $usedStorage = $totalFileSize / 1024 / 1024;   // Convertir la taille totale des fichiers en Mo
-        $freeStorage = $totalStorage - $usedStorage;   // Espace de stockage restant
+        // Utilisation du stockage
+        $totalStorage = $user->getTotalStorageSpace(); // Espace total de stockage de l'utilisateur en Mo
+        $usedStorage = $totalFileSizeInMb;   // Utilisation actuelle en Mo
+        $freeStorage = $totalStorage - $usedStorage;   // Espace de stockage libre en Mo
 
         // Nombre total de fichiers
         $totalFiles = count($files);
 
         return $this->render('file/stats.html.twig', [
             'totalFiles' => $totalFiles,
-            'filesToday' => $fileRepository->countFilesUploadedTodayByUser($user), // Méthode personnalisée pour obtenir les fichiers uploadés aujourd'hui
-            'totalFileSize' => $totalFileSize,
+            'filesToday' => $fileRepository->countFilesUploadedTodayByUser($user), // Méthode personnalisée pour les fichiers uploadés aujourd'hui
+            'totalFileSize' => $totalFileSizeInMb,
             'totalStorage' => $totalStorage,
             'usedStorage' => $usedStorage,
             'freeStorage' => $freeStorage,
         ]);
     }
+
+
 
     #[Route('/my-files', name: 'app_user_files', methods: ['GET'])]
     public function userFiles(FileRepository $fileRepository): Response

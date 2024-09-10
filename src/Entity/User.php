@@ -60,14 +60,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $registrationDate = null;
 
-    #[ORM\Column]
-    private ?int $totalStorageSpace = 0;
+    #[ORM\Column(type: 'float')]
+    private ?float $totalStorageSpace = 2000.0;
 
-    #[ORM\Column]
-    private ?int $storageLimit = 0;
+    #[ORM\Column(type: 'float')]
+    private ?float $storageLimit = 2000.0;
 
-    #[ORM\Column]
-    private ?int $storageUsed = 0;
+    #[ORM\Column(type: 'float')]
+    private ?float $storageUsed = 0;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
@@ -262,36 +262,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getTotalStorageSpace(): ?int
+    public function getTotalStorageSpace(): ?float
     {
         return $this->totalStorageSpace;
     }
 
-    public function setTotalStorageSpace(int $totalStorageSpace): static
+    public function setTotalStorageSpace(float $totalStorageSpace): static
     {
         $this->totalStorageSpace = $totalStorageSpace;
 
         return $this;
     }
 
-    public function getStorageLimit(): ?int
+    public function getStorageLimit(): ?float
     {
         return $this->storageLimit;
     }
 
-    public function setStorageLimit(int $storageLimit): static
+    public function setStorageLimit(float $storageLimit): static
     {
         $this->storageLimit = $storageLimit;
 
         return $this;
     }
 
-    public function getStorageUsed(): ?int
+    public function getStorageUsed(): ?float
     {
         return $this->storageUsed;
     }
 
-    public function setStorageUsed(int $storageUsed): static
+    public function setStorageUsed(float $storageUsed): static
     {
         $this->storageUsed = $storageUsed;
 
