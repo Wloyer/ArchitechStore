@@ -22,18 +22,17 @@ Pour installer et exécuter cette plateforme, vous aurez besoin de :
 
 Installation
 
-    Cloner le repository :
+Cloner le repository :
 
-    bash
+    git clone https://github.com/Wloyer/ArchitechStore.git
+    cd ArchiStore
 
-git clone url_du_repository ArchiStore
-cd ArchiStore
+
 
 Installer les dépendances PHP avec Composer :
 
-bash
 
-composer install
+    composer install
 
 Configurer l'environnement :
 
